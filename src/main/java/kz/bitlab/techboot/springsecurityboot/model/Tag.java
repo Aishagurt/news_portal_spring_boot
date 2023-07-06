@@ -1,5 +1,6 @@
 package kz.bitlab.techboot.springsecurityboot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -21,6 +22,7 @@ public class Tag extends BaseModel{
     @Column(name = "tag_name", nullable = false)
     private String name;
     @ManyToMany(mappedBy = "tags")
+    @JsonIgnore
     private Set<Post> posts;
 
     public Tag(String name) {

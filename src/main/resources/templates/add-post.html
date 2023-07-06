@@ -53,13 +53,26 @@
             </div>
             <div class="row mt-3">
                 <div class="col-12">
+                    <label>Categories:</label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <select id="category" name="category">
+                        <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
                     <button class="btn btn-success" onclick="addPost()">ADD POST</button>
                 </div>
             </div>
         </div>
 
         <script type="text/javascript">
-            function addPost() {
+            function addPost() { // todo: add category list
                 const httpRequest = new XMLHttpRequest();
                 httpRequest.open("POST", "/api/post/add-post", true);
                 httpRequest.setRequestHeader("Content-Type", "application/json");
@@ -69,35 +82,42 @@
                 let imageUrl = "ddd";
                 let authorName = document.getElementById("authorName");
                 let published = true;
+                let selectedCategory = document.getElementById("category").value;
                 let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
-
                 let now = new Date();
                 let createdAt = now.toISOString();
 
-                httpRequest.onreadystatechange = function () {
+                httpRequest.onreadystatechange = function() {
                     if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
                         title.value = "";
                         content.value = "";
                         authorName.value = "";
                         createdAt = "";
+                        selectedCategory.value = "";
                         clearSelectedTags();
                         loadPosts();
                     }
                 };
 
+                let tags = selectedTags.map(tagName => {
+                    return { name: tagName };
+                });
+
                 let body = {
-                    'title': title.value,
-                    'content': content.value,
-                    'createdAt': createdAt,
-                    'authorName': authorName.value,
-                    'tagNames': selectedTags,
-                    'imageUrl': imageUrl,
-                    'published': published
+                    title: title.value,
+                    content: content.value,
+                    createdAt: createdAt,
+                    authorName: authorName.value,
+                    category: null,
+                    tags: tags,
+                    imageUrl: imageUrl,
+                    published: published
                 };
 
                 body = JSON.stringify(body);
                 httpRequest.send(body);
             }
+
 
             document.addEventListener("DOMContentLoaded", function() {
                 var xhr = new XMLHttpRequest();
@@ -196,9 +216,7 @@
                                 </div>
                             </div>
                             <div class="row mt-2">
-                                <div class="col-12">
-                                    <select multiple class="form-control" id="tagsList">
-                                    </select>
+                                <div class="col-12" id="tagsList">
                                 </div>
                             </div>
                         </div>
@@ -249,9 +267,7 @@
                                 </div>
                             </div>
                             <div class="row mt-2">
-                                <div class="col-12">
-                                    <select multiple class="form-control" id="tagsList">
-                                    </select>
+                                <div class="col-12" id="tagsList">
                                 </div>
                             </div>
                         </div>
@@ -260,7 +276,7 @@
                             <button type="button" class="btn btn-primary" onclick="updatePost()">SAVE</button>
                         </div>
                         <script type="text/javascript">
-                            function updatePost(){
+                            function updatePost(){   // todo: doesn't work correctly
 
                                 const httpRequest = new XMLHttpRequest();
                                 httpRequest.open("PUT", "/api/post/update-post", true);
@@ -295,8 +311,8 @@
                                     'title': titleName.value,
                                     'content': contentArea.value,
                                     'createdAt': createdAt,
-                                    'authorName': author.value,
-                                    'tagNames': selectedTags,
+                                    'author': author.value,
+                                    'tags': selectedTags,
                                     'imageUrl': imgUrl.value,
                                     'published': published
                                 };
@@ -312,8 +328,6 @@
                                 if(approve){
 
                                     let postId = document.getElementById("postId");
-
-                                    console.log(postId.value);
 
                                     const httpRequest = new XMLHttpRequest();
                                     httpRequest.open("DELETE", "/api/post/delete-post/"+postId.value, true);
@@ -349,8 +363,6 @@
 
                     let postList = JSON.parse(httpRequest.responseText);
 
-
-                    console.log(postList.tagNames);
                     let tableContent = "";
                     for (let i = 0; i < postList.length; i++) {
                         tableContent += "<tr>";
@@ -362,7 +374,9 @@
 
                         tableContent += "<td>";
                         if (postList[i].tags && postList[i].tags.length > 0) {
-                            tableContent += postList[i].tags.join(", ");
+                            for (var j = 0; j < postList[i].tags.length; j++) {
+                                tableContent += postList[i].tags[j].name;
+                            }
                         }
                         tableContent += "</td>";
 
@@ -388,16 +402,24 @@
                     titleName.value = result.title;
                     contentArea.value = result.content;
 
+                    let tagsList = document.getElementById('tagsList');
+
                     while (tagsList.firstChild) {
                         tagsList.firstChild.remove();
                     }
 
-                    // result.tagNames.forEach(function (tagName) {
-                    //     let tagElement = document.createElement('span');
-                    //     tagElement.classList.add('badge', 'bg-primary', 'me-1');
-                    //     tagElement.textContent = tagName;
-                    //     tagsList.appendChild(tagElement);
-                    // });
+                    if (result && Array.isArray(result.tags)) {
+                        let tagsList = document.getElementById('tagsList');
+
+                        tagsList.innerHTML = "";
+
+                        result.tags.forEach(function (tag) {
+                            let tagElement = document.createElement('span');
+                            tagElement.classList.add('badge', 'bg-primary', 'me-1');
+                            tagElement.textContent = tag.name;
+                            tagsList.appendChild(tagElement);
+                        });
+                    }
 
                     detailsModal.show();
 

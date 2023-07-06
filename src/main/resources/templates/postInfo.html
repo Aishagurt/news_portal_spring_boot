@@ -4,11 +4,12 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Blog Template for Bootstrap</title>
+    <title>DevNexus</title>
 
     <link rel="stylesheet" type="text/css" th:href = "@{'/css/bootstrap.css'}">
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
     <link rel="stylesheet" type="text/css" th:href = "@{'/css/blog.css'}">
+    <link rel="stylesheet" type="text/css" th:href = "@{'/css/style.css'}">
 </head>
 
 <body>
@@ -34,6 +35,7 @@
                     </ul>
                 </div>
                 <a class="btn btn-sm btn-outline-secondary" th:href="@{'/sign-up-page'}" sec:authorize="isAnonymous()">Sign up</a>
+                <a class="btn btn-sm btn-outline-secondary" th:href="@{'/sign-in-page'}" sec:authorize="isAnonymous()">Sign in</a>
             </div>
 
         </div>

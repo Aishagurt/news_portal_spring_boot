@@ -1,5 +1,8 @@
 package kz.bitlab.techboot.springsecurityboot.dto;
 
+import kz.bitlab.techboot.springsecurityboot.model.Category;
+import kz.bitlab.techboot.springsecurityboot.model.Tag;
+import kz.bitlab.techboot.springsecurityboot.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +16,9 @@ public class PostDTO {
     private String title;
     private String content;
     private LocalDateTime createdAt;
-    private String authorName;
-//    private String categoryName;
-    private List<String> tagNames;
+    private String authorname;
+    private Category category;
+    private List<Tag> tags;
     private String imageUrl;
     private boolean published;
 

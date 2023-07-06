@@ -1,5 +1,6 @@
 package kz.bitlab.techboot.springsecurityboot.api;
 
+import kz.bitlab.techboot.springsecurityboot.dto.UserDTO;
 import kz.bitlab.techboot.springsecurityboot.model.User;
 import kz.bitlab.techboot.springsecurityboot.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,5 +13,5 @@ public class UserRestController {
     private final UserService userService;
 
     @PutMapping
-    public User updateUser(@RequestBody User user) { return userService.updateUser(user); }
+    public UserDTO updateUser(@RequestBody UserDTO user) { return userService.updateUser(user); }
 }

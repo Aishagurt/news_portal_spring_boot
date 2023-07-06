@@ -3,6 +3,7 @@ package kz.bitlab.techboot.springsecurityboot.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,11 +29,12 @@ public class Post extends BaseModel{
     @JoinColumn(name = "user_id")
     private User author;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "category_id")
-//    private Category category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @ManyToMany
+    @Cascade({org.hibernate.annotations.CascadeType.PERSIST, org.hibernate.annotations.CascadeType.MERGE})
     @JoinTable(
             name = "post_tags",
             joinColumns = @JoinColumn(name = "post_id"),
@@ -58,5 +60,9 @@ public class Post extends BaseModel{
             tags.remove(tag);
         }
     }
-
+    public void removeCategory(Category category){
+        if(category !=null){
+            this.category = null;
+        }
+    }
 }

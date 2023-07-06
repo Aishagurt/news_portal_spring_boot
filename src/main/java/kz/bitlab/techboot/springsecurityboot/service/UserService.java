@@ -1,6 +1,10 @@
 package kz.bitlab.techboot.springsecurityboot.service;
 
+import kz.bitlab.techboot.springsecurityboot.dto.UserDTO;
+import kz.bitlab.techboot.springsecurityboot.mapper.UserMapper;
+import kz.bitlab.techboot.springsecurityboot.model.Permission;
 import kz.bitlab.techboot.springsecurityboot.model.User;
+import kz.bitlab.techboot.springsecurityboot.repository.PermissionRepository;
 import kz.bitlab.techboot.springsecurityboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -11,14 +15,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PermissionRepository permissionRepository;
+    @Autowired
+    private UserMapper userMapper;
 
-    public UserService() {
-    }
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -33,21 +43,26 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User addUser(User user) {
-        User checkUser = userRepository.findByEmail(user.getEmail());
-        if (checkUser == null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return user;
-        }
-        return null;
+    public UserDTO addUser(UserDTO userDTO) {
+        User user = userMapper.toUser(userDTO);
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
+        Set<Permission> permissionSet =  new HashSet<>();
+        List<Permission> permissions = permissionRepository.findAll();
+        permissionSet.add(permissions.get(1));
+        user.setPermissions(permissionSet);
+        User savedUser = userRepository.save(user);
+        return userMapper.toUserDTO(savedUser);
     }
 
-    public User updatePassword(String newPassword, String oldPassword) {
+    public UserDTO updatePassword(String newPassword, String oldPassword) {
 
         User currentUser = getCurrentSessionUser();
         if(passwordEncoder.matches(oldPassword, currentUser.getPassword())){
             currentUser.setPassword(passwordEncoder.encode(newPassword));
-            return userRepository.save(currentUser);
+            return userMapper.toUserDTO(userRepository.save(currentUser));
         }
         return null;
     }
@@ -62,12 +77,28 @@ public class UserService implements UserDetailsService {
         }
         return null;
     }
-    public User updateUser(User user) {
+    public UserDTO updateUser(UserDTO user) {
         User existingUser = userRepository.findById(user.getId()).orElse(null);
+        User updatedUser = userMapper.toUser(user);
         assert existingUser != null;
-        existingUser.setEmail(user.getEmail());
-        existingUser.setFullName(user.getFullName());
+        updatedUser.setEmail(user.getEmail());
+        updatedUser.setFullName(user.getFullName());
 
-        return (userRepository.save(existingUser));
+        User savedPost = userRepository.save(updatedUser);
+
+        return userMapper.toUserDTO(savedPost);
+    }
+
+    private Set<Permission> mapPermissionDTOs(List<Permission> permissions){
+        Set<Permission> permissionSet = new HashSet<>();
+        for(Permission permission: permissions){
+            Permission permission1 = permissionRepository.findByRole(permission.getRole());
+            if(permission1 == null){
+                permission1 = new Permission(permission.getRole());
+                permissionRepository.save(permission);
+            }
+            permissionSet.add(permission1);
+        }
+        return permissionSet;
     }
 }

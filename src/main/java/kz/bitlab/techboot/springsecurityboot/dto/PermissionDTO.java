@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDTO {
+public class PermissionDTO {
     private Long id;
-    private String name;
+    private String role;
 }

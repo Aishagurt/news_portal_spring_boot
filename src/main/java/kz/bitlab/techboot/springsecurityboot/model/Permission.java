@@ -2,6 +2,7 @@ package kz.bitlab.techboot.springsecurityboot.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -9,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 @Table(name = "t_permission")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Permission extends BaseModel implements GrantedAuthority {
 
     @Column(name = "role")
@@ -18,4 +20,6 @@ public class Permission extends BaseModel implements GrantedAuthority {
     public String getAuthority() {
         return this.role;
     }
+
+    public Permission(String role){ this.role = role; }
 }

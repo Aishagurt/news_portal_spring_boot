@@ -4,6 +4,7 @@ import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.TagDTO;
 import kz.bitlab.techboot.springsecurityboot.model.Post;
 import kz.bitlab.techboot.springsecurityboot.model.Tag;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 
 import java.util.ArrayList;
@@ -11,9 +12,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = TagMapper.class)
 public interface PostMapper {
     PostDTO toPostDTO(Post post);
+
+    @InheritInverseConfiguration
     Post toPost(PostDTO postDTO);
 
     List<PostDTO> toDtoList(List<Post> courseList);

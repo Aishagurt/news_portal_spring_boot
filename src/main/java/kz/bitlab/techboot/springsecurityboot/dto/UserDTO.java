@@ -1,5 +1,6 @@
 package kz.bitlab.techboot.springsecurityboot.dto;
 
+import kz.bitlab.techboot.springsecurityboot.model.Permission;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,6 @@ public class UserDTO {
     private String email;
     private String password;
     private String fullName;
-    private List<String> permissions;
+    private List<Permission> permissions;
 //    private ProfileDTO profile;
 }

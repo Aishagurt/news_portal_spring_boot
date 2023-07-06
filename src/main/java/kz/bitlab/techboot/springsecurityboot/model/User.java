@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "t_users")
@@ -25,11 +26,11 @@ public class User extends BaseModel implements UserDetails {
     private String fullName;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "id", referencedColumnName = "id")
-//    private Profile profile;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id", referencedColumnName = "id")
+    private Profile profile;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

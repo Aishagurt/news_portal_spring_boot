@@ -1,9 +1,11 @@
 package kz.bitlab.techboot.springsecurityboot.service;
 
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
+import kz.bitlab.techboot.springsecurityboot.mapper.CategoryMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.PostMapper;
 import kz.bitlab.techboot.springsecurityboot.model.Post;
 import kz.bitlab.techboot.springsecurityboot.model.Tag;
+import kz.bitlab.techboot.springsecurityboot.repository.CategoryRepository;
 import kz.bitlab.techboot.springsecurityboot.repository.PostRepository;
 import kz.bitlab.techboot.springsecurityboot.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +19,13 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final TagRepository tagRepository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     public List<PostDTO> getPosts() { return postMapper.toDtoList(postRepository.findAll()); }
     public PostDTO addPost(PostDTO postDTO) {
         Post post = postMapper.toPost(postDTO);
-        Set<Tag> tags = mapTagDTOs(postDTO.getTagNames());
+        Set<Tag> tags = mapTagDTOs(postDTO.getTags());
         post.setTags(tags);
         Post savedPost = postRepository.save(post);
         return postMapper.toPostDTO(savedPost);
@@ -45,18 +49,18 @@ public class PostService {
     public PostDTO updatePost(PostDTO postDTO) {
         Post existingPost = postRepository.findById(postDTO.getId()).orElse(null);
         Post updatedPost = postMapper.toPost(postDTO);
-        updatedPost.setTags(mapTagDTOs(postDTO.getTagNames()));
+        updatedPost.setTags(mapTagDTOs(postDTO.getTags()));
         updatedPost.setCreatedAt(existingPost.getCreatedAt());
 
         Post savedPost = postRepository.save(updatedPost);
         return postMapper.toPostDTO(savedPost);
     }
-    private Set<Tag> mapTagDTOs(List<String> tagDTOs) {
+    private Set<Tag> mapTagDTOs(List<Tag> tagDTOs) {
         Set<Tag> tags = new HashSet<>();
-        for (String tagDTO : tagDTOs) {
-            Tag tag = tagRepository.findByName(tagDTO);
+        for (Tag tagDTO : tagDTOs) {
+            Tag tag = tagRepository.findByName(tagDTO.getName());
             if (tag == null) {
-                tag = new Tag(tagDTO);
+                tag = new Tag(tagDTO.getName());
                 tagRepository.save(tag);
             }
             tags.add(tag);

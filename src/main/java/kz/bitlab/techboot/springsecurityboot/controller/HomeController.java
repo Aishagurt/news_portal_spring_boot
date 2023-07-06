@@ -2,19 +2,24 @@ package kz.bitlab.techboot.springsecurityboot.controller;
 
 
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
+import kz.bitlab.techboot.springsecurityboot.dto.UserDTO;
 import kz.bitlab.techboot.springsecurityboot.model.Post;
 import kz.bitlab.techboot.springsecurityboot.model.User;
+import kz.bitlab.techboot.springsecurityboot.service.CategoryService;
 import kz.bitlab.techboot.springsecurityboot.service.PostService;
 import kz.bitlab.techboot.springsecurityboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -27,6 +32,8 @@ public class HomeController {
     private UserService userService;
     @Autowired
     private PostService postService;
+    @Autowired
+    private CategoryService categoryService;
     private final int POSTS_PER_PAGE = 7;
 
     @GetMapping(value = "/")
@@ -55,8 +62,14 @@ public class HomeController {
         return "update-password";
     }
 
-    @GetMapping(value = "/log-out")
-    public String logOut(){ return "log-out"; };
+    @GetMapping("/log-out")
+    public RedirectView  logOut() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            SecurityContextHolder.getContext().setAuthentication(null);
+        }
+        return new RedirectView("/posts");
+    }
 
     @PostMapping(value = "/to-sign-up")
     public String toSignUp(@RequestParam(name = "user_email") String email,
@@ -64,11 +77,11 @@ public class HomeController {
                            @RequestParam(name = "user_repeat_password") String repeatPassword,
                            @RequestParam(name = "user_full_name") String fullName) {
         if (password.equals(repeatPassword)) {
-            User user = new User();
+            UserDTO user = new UserDTO();
             user.setEmail(email);
             user.setFullName(fullName);
             user.setPassword(password);
-            User newUser = userService.addUser(user);
+            UserDTO newUser = userService.addUser(user);
             if (newUser != null) {
                 return "redirect:/sign-up-page?success";
             } else {
@@ -87,7 +100,7 @@ public class HomeController {
 
         if (newPassword.equals(repeatNewPassword)) {
 
-            User user = userService.updatePassword(newPassword, oldPassword);
+            UserDTO user = userService.updatePassword(newPassword, oldPassword);
             if (user != null) {
                 return "redirect:/update-password-page?success";
             } else {
@@ -122,7 +135,8 @@ public class HomeController {
     }
 
     @GetMapping(value = "/add-post")
-    public String addPostPage(){
+    public String addPostPage(Model model){
+        model.addAttribute("categories", categoryService.getCategories());
         return "/add-post";
     }
 

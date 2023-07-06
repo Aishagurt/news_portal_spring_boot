@@ -81,6 +81,7 @@ body {
     color: #212529;
     text-align: left;
     background-color: #fff;
+    overflow-x: hidden !important;
 }
 *, ::after, ::before {
     box-sizing: border-box;
