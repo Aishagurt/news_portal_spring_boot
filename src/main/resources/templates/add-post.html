@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="layout.html" xmlns="http://www.w3.org/1999/html">
+<div layout:fragment="content">
+
+    <input type="hidden" id = "postId">
+
+    <div class="row mb-3" sec:authorize="hasAnyRole('ROLE_ADMIN')">
+        <input type="hidden" th:value="${#authentication.principal.fullName}" id="authorName">
+        <div class="col-6 mx-auto">
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label>Title : </label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <input type="text" class="form-control" id="title">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label>Content : </label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <textarea class="form-control" id="content"></textarea>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label>Image:</label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <input type="file" class="form-control" id="image">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label>Tags:</label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <select class="form-select" name="tags" id="tags" multiple>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button class="btn btn-success" onclick="addPost()">ADD POST</button>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function addPost() {
+                const httpRequest = new XMLHttpRequest();
+                httpRequest.open("POST", "/api/post/add-post", true);
+                httpRequest.setRequestHeader("Content-Type", "application/json");
+
+                let title = document.getElementById("title");
+                let content = document.getElementById("content");
+                let imageUrl = "ddd";
+                let authorName = document.getElementById("authorName");
+                let published = true;
+                let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
+
+                let now = new Date();
+                let createdAt = now.toISOString();
+
+                httpRequest.onreadystatechange = function () {
+                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                        title.value = "";
+                        content.value = "";
+                        authorName.value = "";
+                        createdAt = "";
+                        clearSelectedTags();
+                        loadPosts();
+                    }
+                };
+
+                let body = {
+                    'title': title.value,
+                    'content': content.value,
+                    'createdAt': createdAt,
+                    'authorName': authorName.value,
+                    'tagNames': selectedTags,
+                    'imageUrl': imageUrl,
+                    'published': published
+                };
+
+                body = JSON.stringify(body);
+                httpRequest.send(body);
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/api/tag", true);
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            var tags = JSON.parse(xhr.responseText);
+                            var selectElement = document.getElementById("tags");
+
+                            tags.forEach(function(tag) {
+                                var option = document.createElement("option");
+                                option.value = tag.id;
+                                option.text = tag.name;
+                                selectElement.appendChild(option);
+                            });
+                        } else {
+                            console.error("Error retrieving tags:", xhr.status);
+                        }
+                    }
+                };
+
+                xhr.send();
+            });
+
+            function clearSelectedTags() {
+                let selectedTags = document.querySelectorAll("#tags option:checked");
+                selectedTags.forEach(option => {
+                    option.selected = false;
+                });
+            }
+
+
+        </script>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>createdAt</th>
+                    <th>author</th>
+                    <th>tags</th>
+                    <th style="width: 10%;">DETAILS</th>
+                </tr>
+                </thead>
+                <tbody id="PostListBody">
+                </tbody>
+            </table>
+
+            <div class="modal fade" id="detailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content" sec:authorize="!hasAnyRole('ROLE_ADMIN')">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Post Details</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Title : </label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <input type="text" readonly class="form-control" id="titleName">
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Content : </label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <textarea class="form-control" readonly id="contentArea"></textarea>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Image:</label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <input type="file" class="form-control" id="imageUrl">
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Tags:</label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <select multiple class="form-control" id="tagsList">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+                        </div>
+                    </div>
+                    <div class="modal-content" sec:authorize="hasAnyRole('ROLE_ADMIN')">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Post Details</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <input type="hidden" id="author">
+                        <div class="modal-body">
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Title : </label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <input type="text" class="form-control" id="titleName">
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Content : </label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <textarea class="form-control" id="contentArea"></textarea>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Image:</label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <input type="file" class="form-control" id="imageUrl">
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Tags:</label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <select multiple class="form-control" id="tagsList">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" onclick="deletePost()">DELETE</button>
+                            <button type="button" class="btn btn-primary" onclick="updatePost()">SAVE</button>
+                        </div>
+                        <script type="text/javascript">
+                            function updatePost(){
+
+                                const httpRequest = new XMLHttpRequest();
+                                httpRequest.open("PUT", "/api/post/update-post", true);
+                                httpRequest.setRequestHeader("Content-Type", "application/json");
+
+                                let postId = document.getElementById("postId");
+                                let titleName = document.getElementById("titleName");
+                                let contentArea = document.getElementById("contentArea");
+                                let now = new Date();
+                                let published = true;
+                                let createdAt = now.toISOString();
+                                let author = document.getElementById("author");
+                                let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
+                                let imgUrl = document.getElementById("imageUrl");
+
+                                httpRequest.onreadystatechange = function () {
+                                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                                        postId.value = "";
+                                        titleName.value = "";
+                                        contentArea.value = "";
+                                        createdAt = "";
+                                        author.value = "";
+                                        imgUrl.value = "";
+                                        selectedTags.value = "";
+                                        createdAt = "";
+                                        loadPosts();
+                                        detailsModal.hide()
+                                    }
+                                };
+
+                                let body = {
+                                    'title': titleName.value,
+                                    'content': contentArea.value,
+                                    'createdAt': createdAt,
+                                    'authorName': author.value,
+                                    'tagNames': selectedTags,
+                                    'imageUrl': imgUrl.value,
+                                    'published': published
+                                };
+
+                                body = JSON.stringify(body);
+                                httpRequest.send(body);
+                            }
+
+                            function deletePost(){
+
+                                let approve = confirm("Are you sure?");
+
+                                if(approve){
+
+                                    let postId = document.getElementById("postId");
+
+                                    console.log(postId.value);
+
+                                    const httpRequest = new XMLHttpRequest();
+                                    httpRequest.open("DELETE", "/api/post/delete-post/"+postId.value, true);
+
+                                    httpRequest.onreadystatechange = function () {
+                                        if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                                            detailsModal.hide();
+                                            loadPosts();
+                                        }
+                                    };
+
+                                    httpRequest.send();
+                                }
+
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        loadPosts();
+
+        function loadPosts() {
+
+            const httpRequest = new XMLHttpRequest();
+            httpRequest.open("GET", "/api/post", true);
+            httpRequest.onreadystatechange = function () {
+                if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+
+                    let postList = JSON.parse(httpRequest.responseText);
+
+
+                    console.log(postList.tagNames);
+                    let tableContent = "";
+                    for (let i = 0; i < postList.length; i++) {
+                        tableContent += "<tr>";
+                        tableContent += "<td>" + postList[i].id + "</td>";
+                        tableContent += "<td>" + postList[i].title + "</td>";
+                        tableContent += "<td>" + postList[i].content + "</td>";
+                        tableContent += "<td>" + postList[i].createdAt + "</td>";
+                        tableContent += "<td>" + postList[i].authorName + "</td>";
+
+                        tableContent += "<td>";
+                        if (postList[i].tags && postList[i].tags.length > 0) {
+                            tableContent += postList[i].tags.join(", ");
+                        }
+                        tableContent += "</td>";
+
+                        tableContent += "<td><button class='btn btn-primary btn-sm' onclick='openPostDetailsModal("+postList[i].id+")'>DETAILS</button></td>";
+                        tableContent += "</tr>";
+                    }
+                    document.getElementById("PostListBody").innerHTML = tableContent;
+                }
+            }
+            httpRequest.send();
+        }
+
+        function openPostDetailsModal(id){
+
+            detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+
+            const httpRequest = new XMLHttpRequest();
+            httpRequest.open("GET", "/api/post/get-post/"+id, true);
+            httpRequest.onreadystatechange = function () {
+                if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                    let result = JSON.parse(httpRequest.responseText);
+                    postId.value = id;
+                    titleName.value = result.title;
+                    contentArea.value = result.content;
+
+                    while (tagsList.firstChild) {
+                        tagsList.firstChild.remove();
+                    }
+
+                    // result.tagNames.forEach(function (tagName) {
+                    //     let tagElement = document.createElement('span');
+                    //     tagElement.classList.add('badge', 'bg-primary', 'me-1');
+                    //     tagElement.textContent = tagName;
+                    //     tagsList.appendChild(tagElement);
+                    // });
+
+                    detailsModal.show();
+
+                }
+            }
+            httpRequest.send();
+        }
+
+    </script>
+
+</div>
+</html>

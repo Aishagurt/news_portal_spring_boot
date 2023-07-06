@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en" xmlns:th = "http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="utf-8">
+
+  <title>Blog Template for Bootstrap</title>
+
+  <link rel="stylesheet" type="text/css" th:href = "@{'/css/bootstrap.css'}">
+  <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" th:href = "@{'/css/blog.css'}">
+</head>
+
+<body>
+
+  <div class="container">
+    <header class="blog-header py-3">
+      <div class="row flex-nowrap justify-content-between align-items-center">
+        <a class="navbar-brand" th:href="@{'/add-post'}">
+          <img th:src="@{/logo.png}" alt="Logo" height="30" width="30" class="mr-2">
+          <strong>DevNexus</strong>
+        </a>
+
+        <div class="dropdown">
+          <div sec:authorize="isAuthenticated()">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <img th:src="@{/profile.png}" alt="Profile" height="30" width="30" class="mr-2">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" >
+              <li><a class="dropdown-item" th:href="@{'/profile'}">Profile</a></li>
+              <li sec:authorize="hasAnyRole('ROLE_ADMIN')"><a class="dropdown-item" th:href="@{'/admin-panel'}">Admin panel</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li ><a class="dropdown-item" th:href="@{'/log-out'}">Log out</a></li>
+            </ul>
+          </div>
+          <a class="btn btn-sm btn-outline-secondary" th:href="@{'/sign-up-page'}" sec:authorize="isAnonymous()">Sign up</a>
+        </div>
+
+      </div>
+    </header>
+
+    <div class="nav-scroller py-1 mb-2">
+      <nav class="nav d-flex justify-content-between">
+        <a class="p-2 text-muted" href="#">World</a>
+        <a class="p-2 text-muted" href="#">Kz</a>
+        <a class="p-2 text-muted" href="#">Technology</a>
+        <a class="p-2 text-muted" href="#">Design</a>
+        <a class="p-2 text-muted" href="#">Culture</a>
+        <a class="p-2 text-muted" href="#">Business</a>
+        <a class="p-2 text-muted" href="#">Politics</a>
+        <a class="p-2 text-muted" href="#">Opinion</a>
+        <a class="p-2 text-muted" href="#">Science</a>
+        <a class="p-2 text-muted" href="#">Health</a>
+        <a class="p-2 text-muted" href="#">Style</a>
+        <a class="p-2 text-muted" href="#">Travel</a>
+      </nav>
+    </div>
+
+    <div class="jumbotron p-3 p-md-5 text-white rounded bg-dark">
+      <div class="col-md-6 px-0">
+        <h1 class="display-4 font-italic" th:text="${posts[0].getTitle()}"></h1>
+        <p class="lead my-3">
+        <script th:inline="javascript">
+          var content = String(/*[[${posts[0].getContent()}]]*/);
+          var words = content.split(' ');
+          var limitedContent = words.slice(0, 15).join(' ');
+          document.write(limitedContent);
+        </script>
+        </p>
+        <p class="lead mb-0"><a th:href="@{/postInfo/{id}(id=${posts[0].getId()})}" class="text-white font-weight-bold">Continue reading...</a></p>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div th:each="post, status : ${posts}" class="col-md-6" th:unless="${status.index == 0}">
+        <div class="card flex-md-row mb-4 box-shadow h-md-250">
+          <div class="card-body d-flex flex-column align-items-start">
+            <strong class="d-inline-block mb-2 text-success">Category</strong>
+            <h3 class="mb-0">
+              <a class="text-dark" th:href="@{/postInfo/{id}(id=${post.getId()})}" th:text="${post.getTitle()}"></a>
+            </h3>
+            <div class="mb-1 text-muted">
+              <script>
+                var date = new Date(/*[[${post.getCreatedAt()}]]*/);
+                var options = { month: 'short', day: 'numeric', locale: 'en-US' };
+                var formattedDate = date.toLocaleDateString('en-US', options);
+                document.write(formattedDate);
+              </script>
+            </div>
+            <p class="card-text mb-auto">
+              <script th:inline="javascript">
+                var content = String(/*[[${post.getContent()}]]*/);
+                var words = content.split(' ');
+                var limitedContent = words.slice(0, 15).join(' ');
+                document.write(limitedContent);
+              </script>
+            </p>
+            <a th:href="@{/postInfo/{id}(id=${post.getId()})}">Continue reading</a>
+          </div>
+          <img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-2" id="postContainer">
+    </div>
+
+  </div>
+
+  <script>
+    var page = 1;
+    var isLoading = false;
+    function loadMorePosts() {
+      if (!isLoading) {
+        isLoading = true;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/load-more?page=' + page, true);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var posts = JSON.parse(xhr.responseText);
+
+            if (posts.length > 0) {
+              var postContainer = document.getElementById('postContainer');
+
+              posts.forEach(function(post) {
+                var contentWords = post.content.split(' ');
+                var limitedContent = contentWords.slice(0, 15).join(' ');
+
+                var date = new Date(post.createdAt);
+                var options = { month: 'short', day: 'numeric', locale: 'en-US' };
+                var formattedDate = date.toLocaleDateString('en-US', options);
+
+                var postHtml =
+                        '<div class="col-md-6">' +
+                        '<div class="card flex-md-row mb-4 box-shadow h-md-250">' +
+                        '<div class="card-body d-flex flex-column align-items-start">' +
+                        '<strong class="d-inline-block mb-2 text-success">Category</strong>' +
+                        '<h3 class="mb-0">' +
+                        '<a class="text-dark" href="/postInfo/' +
+                        post.id +
+                        '">' +
+                        post.title +
+                        '</a>' +
+                        '</h3>' +
+                        '<div class="mb-1 text-muted">' +
+                        formattedDate +
+                        '</div>' +
+                        '<p class="card-text mb-auto">' +
+                        limitedContent +
+                        '</p>' +
+                        '<a href="/postInfo/' +
+                        post.id +
+                        '">Continue reading</a>' +
+                        '</div>' +
+                        '<img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">' +
+                        '</div>' +
+                        '</div>';
+
+                var div = document.createElement('div');
+                div.innerHTML = postHtml;
+                postContainer.appendChild(div.firstChild);
+              });
+
+              page++;
+            }
+
+            isLoading = false;
+          }
+        };
+        xhr.send();
+      }
+    }
+
+    window.addEventListener('scroll', function() {
+      if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        loadMorePosts();
+      }
+    });
+  </script>
+
+
+
+
+  <footer class="blog-footer">
+    <p>Made by <a href="https://t.me/Aishuga">Aisha</a> with the help of <a href="https://getbootstrap.com/">Bootstrap</a>.</p>
+  </footer>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script type="text/javascript" th:src = "@{'/js/bootstrap.bundle.js'}"></script>
+  <script type="text/javascript" th:src = "@{'/js/holder.min.js'}"></script>
+</body>
+</html>

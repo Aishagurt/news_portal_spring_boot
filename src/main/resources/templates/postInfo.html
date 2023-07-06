@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" xmlns:th = "http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+
+    <title>Blog Template for Bootstrap</title>
+
+    <link rel="stylesheet" type="text/css" th:href = "@{'/css/bootstrap.css'}">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href = "@{'/css/blog.css'}">
+</head>
+
+<body>
+
+<div class="container">
+    <header class="blog-header py-3">
+        <div class="row flex-nowrap justify-content-between align-items-center">
+            <a class="navbar-brand" th:href="@{'/add-post'}">
+                <img th:src="@{/logo.png}" alt="Logo" height="30" width="30" class="mr-2">
+                <strong>DevNexus</strong>
+            </a>
+
+            <div class="dropdown">
+                <div sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img th:src="@{/profile.png}" alt="Profile" height="30" width="30" class="mr-2">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" >
+                        <li><a class="dropdown-item" th:href="@{'/profile'}">Profile</a></li>
+                        <li sec:authorize="hasAnyRole('ROLE_ADMIN')"><a class="dropdown-item" th:href="@{'/admin-panel'}">Admin panel</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li ><a class="dropdown-item" th:href="@{'/log-out'}">Log out</a></li>
+                    </ul>
+                </div>
+                <a class="btn btn-sm btn-outline-secondary" th:href="@{'/sign-up-page'}" sec:authorize="isAnonymous()">Sign up</a>
+            </div>
+
+        </div>
+    </header>
+
+    <div class="nav-scroller py-1 mb-2">
+        <nav class="nav d-flex justify-content-between">
+            <a class="p-2 text-muted" href="#">World</a>
+            <a class="p-2 text-muted" href="#">Kz</a>
+            <a class="p-2 text-muted" href="#">Technology</a>
+            <a class="p-2 text-muted" href="#">Design</a>
+            <a class="p-2 text-muted" href="#">Culture</a>
+            <a class="p-2 text-muted" href="#">Business</a>
+            <a class="p-2 text-muted" href="#">Politics</a>
+            <a class="p-2 text-muted" href="#">Opinion</a>
+            <a class="p-2 text-muted" href="#">Science</a>
+            <a class="p-2 text-muted" href="#">Health</a>
+            <a class="p-2 text-muted" href="#">Style</a>
+            <a class="p-2 text-muted" href="#">Travel</a>
+        </nav>
+    </div>
+
+    <div class="blog-post">
+        <h2 class="blog-post-title" th:text="${post.getTitle()}"> </h2>
+        <p class="blog-post-meta">
+            <script>
+                var date = new Date(/*[[${post.getCreatedAt()}]]*/);
+                var options = { month: 'short', day: 'numeric', locale: 'en-US' };
+                var formattedDate = date.toLocaleDateString('en-US', options);
+                document.write(formattedDate);
+            </script>
+            <a href="#">Author name</a></p>
+
+        <p th:text="${post.getContent()}"></p>
+    </div>
+
+
+</div>
+
+</main>
+
+<footer class="blog-footer">
+    <p>Made by <a href="https://t.me/Aishuga">Aisha</a> with the help of <a href="https://getbootstrap.com/">Bootstrap</a>.</p>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script type="text/javascript" th:src = "@{'/js/popper.min.js'}"></script>
+<script type="text/javascript" th:src = "@{'/js/bootstrap.bundle.js'}"></script>
+<script type="text/javascript" th:src = "@{'/js/holder.min.js'}"></script>
+</body>
+</html>

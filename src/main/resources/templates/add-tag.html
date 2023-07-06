@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="layout.html">
+<div layout:fragment="content">
+
+  <input type="hidden" id = "tagId">
+
+  <div class="row mb-3">
+    <div class="col-6 mx-auto">
+      <div class="row mt-3">
+        <div class="col-12">
+          <label>NAME : </label>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">
+          <input type="text" class="form-control" id="tagName">
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-12">
+          <button class="btn btn-success" onclick="addTag()">ADD TAG</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      function addTag() {
+
+        const httpRequest = new XMLHttpRequest();
+        httpRequest.open("POST",  "/api/tag/add-tag", true);
+        httpRequest.setRequestHeader("Content-Type", "application/json");
+
+        let tagName = document.getElementById("tagName");
+
+        httpRequest.onreadystatechange = function () {
+          if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+            tagName.value = "";
+            loadTags();
+          }
+        };
+
+        let body = {
+          'name': tagName.value,
+        };
+
+        body = JSON.stringify(body);
+        httpRequest.send(body);
+
+      }
+    </script>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>NAME</th>
+            <th style="width: 10%;">DETAILS</th>
+          </tr>
+          </thead>
+          <tbody id="courseListBody">
+          </tbody>
+        </table>
+
+        <div class="modal fade" id="detailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Course Details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row mt-3">
+                  <div class="col-12">
+                    <label>NAME : </label>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-12">
+                    <input type="text" class="form-control" id="tagNameDetails">
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="deleteTag()">DELETE</button>
+                <button type="button" class="btn btn-primary" onclick="updateTag()">SAVE</button>
+              </div>
+              <script type="text/javascript">
+                function updateTag(){
+
+                  const httpRequest = new XMLHttpRequest();
+                  httpRequest.open("PUT", "/api/tag/update-tag", true);
+                  httpRequest.setRequestHeader("Content-Type", "application/json");
+
+                  let tagId = document.getElementById("tagId");
+                  let tagName = document.getElementById("tagNameDetails");
+
+                  httpRequest.onreadystatechange = function () {
+                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                      tagId.value = "";
+                      tagName.value = "";
+                      loadTags();
+                      detailsModal.hide();
+                    }
+                  };
+
+                  let body = {
+                    'id' : tagId.value,
+                    'name': tagName.value,
+                  };
+
+                  body = JSON.stringify(body);
+                  httpRequest.send(body);
+                }
+
+                function deleteTag(){
+
+                  let approve = confirm("Are you sure?");
+
+                  if(approve){
+
+                    let tagId = document.getElementById("tagId");
+
+                    const httpRequest = new XMLHttpRequest();
+                    httpRequest.open("DELETE", "/api/tag/"+tagId.value, true);
+
+                    httpRequest.onreadystatechange = function () {
+                      if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                        detailsModal.hide();
+                        loadTags();
+                      }
+                    };
+
+                    httpRequest.send();
+                  }
+
+                }
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+
+    loadTags();
+
+    function loadTags() {
+
+      const httpRequest = new XMLHttpRequest();
+      httpRequest.open("GET", "/api/tag", true);
+      httpRequest.onreadystatechange = function () {
+        if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+
+          let tagList = JSON.parse(httpRequest.responseText);
+
+          let tableContent = "";
+          for (let i = 0; i < tagList.length; i++) {
+            tableContent += "<tr>";
+            tableContent += "<td>" + tagList[i].id + "</td>";
+            tableContent += "<td>" + tagList[i].name + "</td>";
+            tableContent += "<td><button class='btn btn-primary btn-sm' onclick='openTagDetailsModal("+tagList[i].id+")'>DETAILS</button></td>";
+            tableContent += "</tr>";
+          }
+          document.getElementById("courseListBody").innerHTML = tableContent;
+        }
+      }
+      httpRequest.send();
+    }
+
+    function openTagDetailsModal(id){
+
+      detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+
+      const httpRequest = new XMLHttpRequest();
+      httpRequest.open("GET", "/api/tag/get-tag/"+id, true);
+      httpRequest.onreadystatechange = function () {
+        if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+          let result = JSON.parse(httpRequest.responseText);
+          tagNameDetails.value = result.name;
+          tagId.value = result.id;
+
+          detailsModal.show();
+
+        }
+      }
+      httpRequest.send();
+    }
+
+  </script>
+
+</div>
+</html>
