@@ -8,7 +8,6 @@
     <input type="hidden" id = "postId">
 
     <div class="row mb-3" sec:authorize="hasAnyRole('ROLE_ADMIN')">
-        <input type="hidden" th:value="${#authentication.principal.fullName}" id="authorName">
         <div class="col-6 mx-auto">
             <div class="row mt-3">
                 <div class="col-12">
@@ -58,8 +57,8 @@
             </div>
             <div class="row mt-2">
                 <div class="col-12">
-                    <select id="category" name="category">
-                        <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
+                    <select id="category" name="category" class="form-select">
+                        <option th:each="category : ${categories}" th:value="${category}" th:text="${category.getName()}"></option>
                     </select>
                 </div>
             </div>
@@ -67,12 +66,14 @@
             <div class="row mt-3">
                 <div class="col-12">
                     <button class="btn btn-success" onclick="addPost()">ADD POST</button>
+                    <a class="btn btn-primary" th:href="@{'/add-tag'}">ADD TAG</a>
+                    <a class="btn btn-warning" th:href="@{'/add-category'}">ADD CATEGORY</a>
                 </div>
             </div>
         </div>
 
         <script type="text/javascript">
-            function addPost() { // todo: add category list
+            function addPost() {
                 const httpRequest = new XMLHttpRequest();
                 httpRequest.open("POST", "/api/post/add-post", true);
                 httpRequest.setRequestHeader("Content-Type", "application/json");
@@ -80,9 +81,8 @@
                 let title = document.getElementById("title");
                 let content = document.getElementById("content");
                 let imageUrl = "ddd";
-                let authorName = document.getElementById("authorName");
                 let published = true;
-                let selectedCategory = document.getElementById("category").value;
+                let selectedCategory = document.getElementById("category");
                 let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
                 let now = new Date();
                 let createdAt = now.toISOString();
@@ -91,7 +91,6 @@
                     if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
                         title.value = "";
                         content.value = "";
-                        authorName.value = "";
                         createdAt = "";
                         selectedCategory.value = "";
                         clearSelectedTags();
@@ -103,12 +102,15 @@
                     return { name: tagName };
                 });
 
+                let categorySelectedName = selectedCategory.options[selectedCategory.selectedIndex].text;
+
+                console.log(categorySelectedName);
+
                 let body = {
                     title: title.value,
                     content: content.value,
                     createdAt: createdAt,
-                    authorName: authorName.value,
-                    category: null,
+                    category: categorySelectedName,
                     tags: tags,
                     imageUrl: imageUrl,
                     published: published
@@ -131,7 +133,7 @@
 
                             tags.forEach(function(tag) {
                                 var option = document.createElement("option");
-                                option.value = tag.id;
+                                option.value = tag.name;
                                 option.text = tag.name;
                                 selectElement.appendChild(option);
                             });
@@ -162,9 +164,9 @@
                     <th>ID</th>
                     <th>Title</th>
                     <th>Content</th>
-                    <th>createdAt</th>
-                    <th>author</th>
-                    <th>tags</th>
+                    <th>Created</th>
+                    <th>Tags</th>
+                    <th>Category</th>
                     <th style="width: 10%;">DETAILS</th>
                 </tr>
                 </thead>
@@ -216,7 +218,20 @@
                                 </div>
                             </div>
                             <div class="row mt-2">
-                                <div class="col-12" id="tagsList">
+                                <div class="col-12">
+                                    <div class="form-control" id="tagsList"></div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Category: </label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <select id="categoryName" name="category" class="form-select">
+                                        <option th:each="category : ${categories}" th:value="${category.getName()}" th:text="${category.getName()}"></option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -229,7 +244,6 @@
                             <h1 class="modal-title fs-5" id="staticBackdropLabel">Post Details</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <input type="hidden" id="author">
                         <div class="modal-body">
                             <div class="row mt-3">
                                 <div class="col-12">
@@ -267,7 +281,20 @@
                                 </div>
                             </div>
                             <div class="row mt-2">
-                                <div class="col-12" id="tagsList">
+                                <div class="col-12">
+                                    <div class="form-control" id="tagsList"></div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label>Category: </label>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <select id="categoryName" name="category" class="form-select">
+                                        <option th:each="category : ${categories}" th:value="${category.getName()}" th:text="${category.getName()}"></option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -276,7 +303,7 @@
                             <button type="button" class="btn btn-primary" onclick="updatePost()">SAVE</button>
                         </div>
                         <script type="text/javascript">
-                            function updatePost(){   // todo: doesn't work correctly
+                            function updatePost(){
 
                                 const httpRequest = new XMLHttpRequest();
                                 httpRequest.open("PUT", "/api/post/update-post", true);
@@ -285,12 +312,14 @@
                                 let postId = document.getElementById("postId");
                                 let titleName = document.getElementById("titleName");
                                 let contentArea = document.getElementById("contentArea");
+                                let categorySelect = document.getElementById("categoryName");
                                 let now = new Date();
                                 let published = true;
                                 let createdAt = now.toISOString();
-                                let author = document.getElementById("author");
                                 let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
                                 let imgUrl = document.getElementById("imageUrl");
+
+                                let selectedOption = categorySelect.options[categorySelect.selectedIndex];
 
                                 httpRequest.onreadystatechange = function () {
                                     if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
@@ -298,21 +327,22 @@
                                         titleName.value = "";
                                         contentArea.value = "";
                                         createdAt = "";
-                                        author.value = "";
                                         imgUrl.value = "";
                                         selectedTags.value = "";
                                         createdAt = "";
+                                        categorySelect.value = "";
                                         loadPosts();
                                         detailsModal.hide()
                                     }
                                 };
 
                                 let body = {
+                                    'id': postId.value,
                                     'title': titleName.value,
                                     'content': contentArea.value,
                                     'createdAt': createdAt,
-                                    'author': author.value,
                                     'tags': selectedTags,
+                                    'category': selectedOption.value,
                                     'imageUrl': imgUrl.value,
                                     'published': published
                                 };
@@ -370,8 +400,6 @@
                         tableContent += "<td>" + postList[i].title + "</td>";
                         tableContent += "<td>" + postList[i].content + "</td>";
                         tableContent += "<td>" + postList[i].createdAt + "</td>";
-                        tableContent += "<td>" + postList[i].authorName + "</td>";
-
                         tableContent += "<td>";
                         if (postList[i].tags && postList[i].tags.length > 0) {
                             for (var j = 0; j < postList[i].tags.length; j++) {
@@ -379,6 +407,7 @@
                             }
                         }
                         tableContent += "</td>";
+                        tableContent += "<td>" + postList[i].category + "</td>";
 
                         tableContent += "<td><button class='btn btn-primary btn-sm' onclick='openPostDetailsModal("+postList[i].id+")'>DETAILS</button></td>";
                         tableContent += "</tr>";
@@ -401,6 +430,15 @@
                     postId.value = id;
                     titleName.value = result.title;
                     contentArea.value = result.content;
+
+                    let categoryNameSelect = document.getElementById('categoryName');
+                    let selectedOption = Array.from(categoryNameSelect.options).find(option => option.value === result.category);
+
+                    if (selectedOption) {
+                        selectedOption.selected = true;
+                    } else {
+                        categoryNameSelect.value = "No category";
+                    }
 
                     let tagsList = document.getElementById('tagsList');
 

@@ -1,10 +1,5 @@
 package kz.bitlab.techboot.springsecurityboot;
 
-import kz.bitlab.techboot.springsecurityboot.dto.CourseDTO;
-import kz.bitlab.techboot.springsecurityboot.mapper.CourseMapper;
-import kz.bitlab.techboot.springsecurityboot.model.Course;
-import kz.bitlab.techboot.springsecurityboot.repository.CourseRepository;
-import kz.bitlab.techboot.springsecurityboot.service.CourseService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

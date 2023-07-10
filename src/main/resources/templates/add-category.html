@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="layout.html" xmlns="http://www.w3.org/1999/html">
+<div layout:fragment="content">
+
+    <input type="hidden" id = "catId">
+
+    <div class="row mb-3" sec:authorize="hasAnyRole('ROLE_ADMIN')">
+        <div class="col-6 mx-auto">
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label>NAME : </label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <input type="text" class="form-control" id="name">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button class="btn btn-success" onclick="addCategory()">ADD CATEGORY</button>
+                    <a class="btn btn-primary" th:href="@{'/add-tag'}">ADD TAG</a>
+                    <a class="btn btn-warning" th:href="@{'/admin-panel'}">ADD POST</a>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+
+            function loadCategories() {
+
+                const httpRequest = new XMLHttpRequest();
+                httpRequest.open("GET", "/api/category", true);
+                httpRequest.onreadystatechange = function () {
+                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                        let categoryList = JSON.parse(httpRequest.responseText);
+                        let tableContent = "";
+
+                        for (let i = 0; i < categoryList.length; i++) {
+                            tableContent += "<tr>";
+                            tableContent += "<td>" + categoryList[i].id + "</td>";
+                            tableContent += "<td>" + categoryList[i].name + "</td>";
+                            tableContent += "<td><button class='btn btn-danger btn-sm' onclick='deleteCategory(" + categoryList[i].id + ")'>DELETE</button></td>";
+                            tableContent += "</tr>";
+                        }
+
+                        document.getElementById("CategoryListBody").innerHTML = tableContent;
+                    }
+                }
+                httpRequest.send();
+            }
+
+            loadCategories();
+
+            function addCategory() {
+                const httpRequest = new XMLHttpRequest();
+                httpRequest.open("POST", "/api/category/add-category", true);
+                httpRequest.setRequestHeader("Content-Type", "application/json");
+
+                let name = document.getElementById("name");
+
+                console.log(name.value);
+
+                httpRequest.onreadystatechange = function() {
+                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                        name.value = "";
+                        loadCategories();
+                    }
+                };
+
+
+                let body = {
+                    name: name.value,
+                };
+
+                body = JSON.stringify(body);
+                httpRequest.send(body);
+            }
+
+        </script>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th style="width: 10%;"></th>
+                </tr>
+                </thead>
+                <tbody id="CategoryListBody">
+                </tbody>
+            </table>
+                        <script type="text/javascript">
+                            function updateCategory(catId, name){
+
+                                const httpRequest = new XMLHttpRequest();
+                                httpRequest.open("PUT", "/api/category/update-category", true);
+                                httpRequest.setRequestHeader("Content-Type", "application/json");
+
+                                httpRequest.onreadystatechange = function () {
+                                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                                        catId.value = "";
+                                        name.value = "";
+                                        createdAt = "";
+                                        loadCategories();
+                                    }
+                                };
+
+                                let body = {
+                                    'id': catId,
+                                    'name': name,
+                                };
+
+                                body = JSON.stringify(body);
+                                httpRequest.send(body);
+                            }
+
+                            function deleteCategory(catId){
+
+                                let approve = confirm("Are you sure?");
+
+                                if(approve){
+                                    const httpRequest = new XMLHttpRequest();
+                                    httpRequest.open("DELETE", "/api/category/"+catId, true);
+
+                                    httpRequest.onreadystatechange = function () {
+                                        if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                                            loadCategories();
+                                        }
+                                    };
+
+                                    httpRequest.send();
+                                }
+
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+
+
+
+</script>
+
+</div>
+</html>

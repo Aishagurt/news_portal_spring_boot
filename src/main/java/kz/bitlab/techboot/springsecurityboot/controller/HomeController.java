@@ -1,10 +1,10 @@
 package kz.bitlab.techboot.springsecurityboot.controller;
 
 
+import kz.bitlab.techboot.springsecurityboot.dto.CategoryDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.UserDTO;
-import kz.bitlab.techboot.springsecurityboot.model.Post;
-import kz.bitlab.techboot.springsecurityboot.model.User;
+import kz.bitlab.techboot.springsecurityboot.model.Category;
 import kz.bitlab.techboot.springsecurityboot.service.CategoryService;
 import kz.bitlab.techboot.springsecurityboot.service.PostService;
 import kz.bitlab.techboot.springsecurityboot.service.UserService;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class HomeController {
 
     @GetMapping(value = "/")
     public String indexPage() {
-        return "home";
+        return "signin";
     }
 
     @GetMapping(value = "/sign-in-page")
@@ -123,6 +122,10 @@ public class HomeController {
 
         int totalPosts = allPosts.size();
         model.addAttribute("totalPosts", totalPosts);
+
+        List<CategoryDTO> categoryDTOS = categoryService.getCategories();
+        model.addAttribute("categories", categoryDTOS);
+
         return "/posts";
     }
 
@@ -133,13 +136,6 @@ public class HomeController {
 
         return ResponseEntity.ok(morePosts);
     }
-
-    @GetMapping(value = "/add-post")
-    public String addPostPage(Model model){
-        model.addAttribute("categories", categoryService.getCategories());
-        return "/add-post";
-    }
-
     @GetMapping(value = "/postInfo/{id}")
     public String postInfoPage(@PathVariable(name = "id") Long id, Model model){
         PostDTO postDTO = postService.getPost(id);

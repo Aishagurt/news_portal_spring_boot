@@ -3,6 +3,7 @@ package kz.bitlab.techboot.springsecurityboot.service;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.mapper.CategoryMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.PostMapper;
+import kz.bitlab.techboot.springsecurityboot.model.Category;
 import kz.bitlab.techboot.springsecurityboot.model.Post;
 import kz.bitlab.techboot.springsecurityboot.model.Tag;
 import kz.bitlab.techboot.springsecurityboot.repository.CategoryRepository;
@@ -20,13 +21,24 @@ public class PostService {
     private final PostMapper postMapper;
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
 
     public List<PostDTO> getPosts() { return postMapper.toDtoList(postRepository.findAll()); }
     public PostDTO addPost(PostDTO postDTO) {
         Post post = postMapper.toPost(postDTO);
         Set<Tag> tags = mapTagDTOs(postDTO.getTags());
         post.setTags(tags);
+
+        String categoryName = postDTO.getCategory();
+        Category category = categoryRepository.findByName(categoryName);
+
+        if (category == null) {
+            category = new Category();
+            category.setName(categoryName);
+            category = categoryRepository.save(category);
+        }
+
+        post.setCategory(category);
+
         Post savedPost = postRepository.save(post);
         return postMapper.toPostDTO(savedPost);
     }
@@ -51,6 +63,11 @@ public class PostService {
         Post updatedPost = postMapper.toPost(postDTO);
         updatedPost.setTags(mapTagDTOs(postDTO.getTags()));
         updatedPost.setCreatedAt(existingPost.getCreatedAt());
+
+        String categoryName = postDTO.getCategory();
+        Category category = categoryRepository.findByName(categoryName);
+
+        updatedPost.setCategory(category);
 
         Post savedPost = postRepository.save(updatedPost);
         return postMapper.toPostDTO(savedPost);

@@ -28,10 +28,6 @@ public class User extends BaseModel implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Permission> permissions;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id", referencedColumnName = "id")
-    private Profile profile;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.permissions;

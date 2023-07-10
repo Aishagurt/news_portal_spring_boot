@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 public class Category extends BaseModel{
 
-    @Column(name = "category_name", nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
     @OneToMany(mappedBy = "category")
     @JsonIgnore
