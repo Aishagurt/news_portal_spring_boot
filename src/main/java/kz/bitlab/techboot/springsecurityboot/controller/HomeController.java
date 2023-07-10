@@ -4,7 +4,6 @@ package kz.bitlab.techboot.springsecurityboot.controller;
 import kz.bitlab.techboot.springsecurityboot.dto.CategoryDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.UserDTO;
-import kz.bitlab.techboot.springsecurityboot.model.Category;
 import kz.bitlab.techboot.springsecurityboot.service.CategoryService;
 import kz.bitlab.techboot.springsecurityboot.service.PostService;
 import kz.bitlab.techboot.springsecurityboot.service.UserService;
@@ -131,8 +130,10 @@ public class HomeController {
 
     @GetMapping("/load-more")
     public ResponseEntity<List<PostDTO>> loadMorePosts(@RequestParam("page") int page) {
+        int totalPosts = postService.getPosts().size();
         int startIndex = page * POSTS_PER_PAGE;
-        List<PostDTO> morePosts = postService.getPosts(startIndex, POSTS_PER_PAGE - 1);
+        int endIndex = Math.min(startIndex + POSTS_PER_PAGE, totalPosts);
+        List<PostDTO> morePosts = postService.getPosts(startIndex, endIndex);
 
         return ResponseEntity.ok(morePosts);
     }
@@ -140,7 +141,24 @@ public class HomeController {
     public String postInfoPage(@PathVariable(name = "id") Long id, Model model){
         PostDTO postDTO = postService.getPost(id);
         model.addAttribute("post", postDTO);
+
+        List<CategoryDTO> categoryDTOS = categoryService.getCategories();
+        model.addAttribute("categories", categoryDTOS);
+
         return "/postInfo";
+    }
+
+    @GetMapping(value = "/category/{catId}")
+    public String CategoryPosts(@PathVariable(name="catId") Long id, Model model){
+        CategoryDTO category = categoryService.getCategory(id);
+        model.addAttribute("category", category);
+
+        List<CategoryDTO> categoryDTOS = categoryService.getCategories();
+        model.addAttribute("categories", categoryDTOS);
+
+        List<PostDTO> postDTOS = postService.getPostsByCategoryId(id);
+        model.addAttribute("posts", postDTOS);
+        return "/posts";
     }
 
 }

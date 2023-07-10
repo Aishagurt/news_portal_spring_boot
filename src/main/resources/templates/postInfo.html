@@ -17,7 +17,7 @@
 <div class="container">
     <header class="blog-header py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
-            <a class="navbar-brand" th:href="@{'/add-post'}">
+            <a class="navbar-brand" th:href="@{'/posts'}">
                 <img th:src="@{/logo.png}" alt="Logo" height="30" width="30" class="mr-2">
                 <strong>DevNexus</strong>
             </a>
@@ -43,38 +43,40 @@
 
     <div class="nav-scroller py-1 mb-2">
         <nav class="nav d-flex justify-content-between">
-            <a class="p-2 text-muted" href="#">World</a>
-            <a class="p-2 text-muted" href="#">Kz</a>
-            <a class="p-2 text-muted" href="#">Technology</a>
-            <a class="p-2 text-muted" href="#">Design</a>
-            <a class="p-2 text-muted" href="#">Culture</a>
-            <a class="p-2 text-muted" href="#">Business</a>
-            <a class="p-2 text-muted" href="#">Politics</a>
-            <a class="p-2 text-muted" href="#">Opinion</a>
-            <a class="p-2 text-muted" href="#">Science</a>
-            <a class="p-2 text-muted" href="#">Health</a>
-            <a class="p-2 text-muted" href="#">Style</a>
-            <a class="p-2 text-muted" href="#">Travel</a>
+            <a class="p-2 text-muted" th:each="category : ${categories}" th:href="@{'/category/' + ${category.getId()}}">
+                <span th:text="${category.getName()}"></span>
+            </a>
         </nav>
     </div>
 
-    <div class="blog-post">
-        <h2 class="blog-post-title" th:text="${post.getTitle()}"> </h2>
-        <p class="blog-post-meta">
-            <script>
-                var date = new Date(/*[[${post.getCreatedAt()}]]*/);
-                var options = { month: 'short', day: 'numeric', locale: 'en-US' };
-                var formattedDate = date.toLocaleDateString('en-US', options);
-                document.write(formattedDate);
-            </script>
+    <main role="main" class="container">
+        <div class="row">
+            <div class="col-md-8 blog-main">
+                <div class="blog-post">
+                    <h2 class="blog-post-title" th:text="${post.getTitle()}"></h2>
+                    <p class="blog-post-meta">
+                        <script>
+                            var date = new Date(/*[[${post.getCreatedAt()}]]*/);
+                            var options = { month: 'short', day: 'numeric', locale: 'en-US' };
+                            var formattedDate = date.toLocaleDateString('en-US', options);
+                            document.write(formattedDate);
+                        </script>
+                    </p>
+                    <div th:each="line : ${post.content.split('\n')}">
+                        <p th:text="${line}"></p>
+                    </div>
+                </div>
+            </div>
 
-        <p th:text="${post.getContent()}"></p>
-    </div>
+
+        </div>
+
+    </main>
+
 
 
 </div>
 
-</main>
 
 <footer class="blog-footer">
     <p>Made by <a href="https://t.me/Aishuga">Aisha</a> with the help of <a href="https://getbootstrap.com/">Bootstrap</a>.</p>

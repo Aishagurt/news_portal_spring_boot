@@ -9,42 +9,43 @@
         <link rel="stylesheet" type="text/css" th:href = "@{'/css/style.css'}">
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
+
     <body>
-    <div class="container">
-    <header class="blog-header py-3 greyish-header">
-        <div class="row flex-nowrap justify-content-between align-items-center">
-            <a class="navbar-brand" th:href="@{'/posts'}">
-                <img th:src="@{/logo.png}" alt="Logo" height="30" width="30" class="mr-2">
-                <strong>DevNexus</strong>
-            </a>
-                <div sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img th:src="@{/profile.png}" alt="Profile" height="30" width="30" class="mr-2">
+
+        <div class="container">
+            <header class="blog-header py-3 greyish-header">
+                <div class="row flex-nowrap justify-content-between align-items-center">
+                    <a class="navbar-brand" th:href="@{'/posts'}">
+                        <img th:src="@{/logo.png}" alt="Logo" height="30" width="30" class="mr-2">
+                        <strong>DevNexus</strong>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" th:href="@{'/profile'}">Profile</a></li>
-                        <li sec:authorize="hasAnyRole('ROLE_ADMIN')"><a class="dropdown-item" th:href="@{'/admin-panel'}">Admin panel</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" th:href="@{'/log-out'}">Log out</a></li>
-                    </ul>
+                        <div sec:authorize="isAuthenticated()">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img th:src="@{/profile.png}" alt="Profile" height="30" width="30" class="mr-2">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" th:href="@{'/profile'}">Profile</a></li>
+                                <li sec:authorize="hasAnyRole('ROLE_ADMIN')"><a class="dropdown-item" th:href="@{'/admin-panel'}">Admin panel</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{'/log-out'}">Log out</a></li>
+                            </ul>
+                        </div>
+
+                        <div sec:authorize="isAnonymous()" class="ml-auto">
+                            <a class="btn btn-sm btn-outline-secondary mr-2" th:href="@{'/sign-up-page'}">Sign up</a>
+                            <a class="btn btn-sm btn-outline-secondary" th:href="@{'/sign-in-page'}">Sign in</a>
+                        </div>
                 </div>
+            </header>
 
-                <div sec:authorize="isAnonymous()" class="ml-auto">
-                    <a class="btn btn-sm btn-outline-secondary mr-2" th:href="@{'/sign-up-page'}">Sign up</a>
-                    <a class="btn btn-sm btn-outline-secondary" th:href="@{'/sign-in-page'}">Sign in</a>
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-12">
+                        <div layout:fragment="content"></div>
+                    </div>
                 </div>
-        </div>
-    </header>
-
-
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <div layout:fragment="content"></div>
             </div>
         </div>
-    </div>
-    </div>
-    </body>
-    <script type="text/javascript" th:src = "@{'/js/bootstrap.bundle.js'}"></script>
+        </body>
+        <script type="text/javascript" th:src = "@{'/js/bootstrap.bundle.js'}"></script>
 </html>

@@ -92,4 +92,10 @@ public class PostService {
         return allPosts.subList(startIndex, endIndex);
     }
 
+    public List<PostDTO> getPostsByCategoryId(Long id){
+        Category category = categoryRepository.findById(id).orElse(null);
+        List<Post> posts = postRepository.findByCategory(category);
+        return postMapper.toDtoList(posts);
+    }
+
 }
