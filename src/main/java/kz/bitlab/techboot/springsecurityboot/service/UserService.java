@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
@@ -101,4 +102,43 @@ public class UserService implements UserDetailsService {
         }
         return permissionSet;
     }
+
+    public String isPasswordValid(String password) {
+        if (password.length() < 8)
+            return "Password must be at least 8 characters long.";
+        else if (!password.matches(".*[A-Z].*"))
+            return "Password must contain at least one uppercase letter.";
+
+        else if (!password.matches(".*[a-z].*"))
+            return "Password must contain at least one lowercase letter.";
+        else if (!password.matches(".*\\d.*"))
+            return "Password must contain at least one digit.";
+        else if (!password.matches(".*[!@#$%^&*()].*"))
+            return "Password must contain at least one special character.";
+
+        return null;
+    }
+
+    public String signUpUser(String email, String password, String repeatPassword, String fullName) {
+        if (!password.equals(repeatPassword)) {
+            return "redirect:/sign-up-page?passworderror";
+        }
+
+        UserDTO user = new UserDTO();
+        user.setEmail(email);
+        user.setFullName(fullName);
+        user.setPassword(password);
+
+        UserDTO newUser = addUser(user);
+        if (newUser != null) {
+            return "redirect:/sign-up-page?success";
+        } else {
+            return "redirect:/sign-up-page?emailerror";
+        }
+    }
+
+    public void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
+
 }

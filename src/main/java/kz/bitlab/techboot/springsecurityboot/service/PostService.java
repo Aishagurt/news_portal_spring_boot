@@ -10,6 +10,7 @@ import kz.bitlab.techboot.springsecurityboot.repository.CategoryRepository;
 import kz.bitlab.techboot.springsecurityboot.repository.PostRepository;
 import kz.bitlab.techboot.springsecurityboot.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,6 +22,7 @@ public class PostService {
     private final PostMapper postMapper;
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
+    private final int POSTS_PER_PAGE = 7;
 
     public List<PostDTO> getPosts() { return postMapper.toDtoList(postRepository.findAll()); }
     public PostDTO addPost(PostDTO postDTO) {
@@ -98,4 +100,20 @@ public class PostService {
         return postMapper.toDtoList(posts);
     }
 
+    public List<PostDTO> getInitialPosts() {
+        List<PostDTO> allPosts = getPosts();
+        List<PostDTO> initialPosts = new ArrayList<>();
+        for (int i = 0; i < POSTS_PER_PAGE && i < allPosts.size(); i++) {
+            initialPosts.add(allPosts.get(i));
+        }
+        return initialPosts;
+    }
+
+    public List<PostDTO> getMorePosts(int page, int postsPerPage) {
+        List<PostDTO> allPosts = getPosts();
+        int totalPosts = allPosts.size();
+        int startIndex = page * postsPerPage;
+        int endIndex = Math.min(startIndex + postsPerPage, totalPosts);
+        return allPosts.subList(startIndex, endIndex);
+    }
 }

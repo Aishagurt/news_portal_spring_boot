@@ -36,7 +36,7 @@
             </div>
             <div class="row mt-2">
                 <div class="col-12">
-                    <input type="file" class="form-control" id="image">
+                    <input type="text" class="form-control" id="image">
                 </div>
             </div>
             <div class="row mt-3">
@@ -80,7 +80,7 @@
 
                 let title = document.getElementById("title");
                 let content = document.getElementById("content");
-                let imageUrl = "ddd";
+                let imageUrl = document.getElementById("image");
                 let published = true;
                 let selectedCategory = document.getElementById("category");
                 let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
@@ -92,6 +92,7 @@
                         title.value = "";
                         content.value = "";
                         createdAt = "";
+                        imageUrl.value = "";
                         selectedCategory.value = "";
                         clearSelectedTags();
                         loadPosts();
@@ -112,7 +113,7 @@
                     createdAt: createdAt,
                     category: categorySelectedName,
                     tags: tags,
-                    imageUrl: imageUrl,
+                    imageUrl: imageUrl.value,
                     published: published
                 };
 
@@ -209,7 +210,7 @@
                             </div>
                             <div class="row mt-2">
                                 <div class="col-12">
-                                    <input type="file" class="form-control" id="imageUrl">
+                                    <input type="text" class="form-control" id="imageUrl">
                                 </div>
                             </div>
                             <div class="row mt-3">
@@ -272,7 +273,7 @@
                             </div>
                             <div class="row mt-2">
                                 <div class="col-12">
-                                    <input type="file" class="form-control" id="imageUrl">
+                                    <input type="text" class="form-control" id="imageUrl">
                                 </div>
                             </div>
                             <div class="row mt-3">
@@ -430,6 +431,7 @@
                     postId.value = id;
                     titleName.value = result.title;
                     contentArea.value = result.content;
+                    imageUrl.value = result.imageUrl;
 
                     let categoryNameSelect = document.getElementById('categoryName');
                     let selectedOption = Array.from(categoryNameSelect.options).find(option => option.value === result.category);

@@ -3,6 +3,8 @@ package kz.bitlab.techboot.springsecurityboot.api;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value="/api/post")
 public class PostController {
+    @Autowired
     private final PostService postService;
 
     @GetMapping
@@ -27,4 +30,6 @@ public class PostController {
 
     @DeleteMapping(value = "/delete-post/{id}")
     public void deletePost(@PathVariable(name = "id") Long id){ postService.deletePost(id); }
+
+
 }

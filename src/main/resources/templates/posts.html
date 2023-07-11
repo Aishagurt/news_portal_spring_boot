@@ -90,7 +90,7 @@
             </p>
             <a th:href="@{/postInfo/{id}(id=${post.getId()})}" class="custom-link text-decoration-none">Continue reading</a>
           </div>
-          <img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">
+          <img class="card-img-right flex-auto d-none d-md-block custom-image" th:src="${post.getImageUrl()}" alt="Card image cap">
         </div>
       </div>
     </div>
@@ -146,7 +146,8 @@
                         post.id +
                         '">Continue reading</a>' +
                         '</div>' +
-                        '<img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">' +
+                        '<img class="card-img-right flex-auto d-none d-md-block custom-image" th:src="' + post.imageUrl +
+                        '" alt="Card image cap">' +
                         '</div>' +
                         '</div>';
 
