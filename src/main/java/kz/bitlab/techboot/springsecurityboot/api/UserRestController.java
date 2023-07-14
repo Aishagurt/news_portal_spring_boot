@@ -21,5 +21,5 @@ public class UserRestController {
     private final UserService userService;
 
     @PutMapping
-    public UserDTO updateUser(@RequestBody UserDTO user) { return userService.updateUser(user); }
+    public UserDTO updateUser(@RequestBody UserDTO userDTO) { return userService.updateUser(userDTO); }
 }

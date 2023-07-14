@@ -81,7 +81,6 @@
                 let title = document.getElementById("title");
                 let content = document.getElementById("content");
                 let imageUrl = document.getElementById("image");
-                let published = true;
                 let selectedCategory = document.getElementById("category");
                 let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
                 let now = new Date();
@@ -114,7 +113,6 @@
                     category: categorySelectedName,
                     tags: tags,
                     imageUrl: imageUrl.value,
-                    published: published
                 };
 
                 body = JSON.stringify(body);
@@ -315,9 +313,10 @@
                                 let contentArea = document.getElementById("contentArea");
                                 let categorySelect = document.getElementById("categoryName");
                                 let now = new Date();
-                                let published = true;
                                 let createdAt = now.toISOString();
-                                let selectedTags = Array.from(document.querySelectorAll("#tags option:checked")).map(option => option.value);
+                                var selectedTags = Array.from(tagsList.children).map(function(tagElement) {
+                                    return tagElement.textContent.trim();
+                                });
                                 let imgUrl = document.getElementById("imageUrl");
 
                                 let selectedOption = categorySelect.options[categorySelect.selectedIndex];
@@ -345,7 +344,6 @@
                                     'tags': selectedTags,
                                     'category': selectedOption.value,
                                     'imageUrl': imgUrl.value,
-                                    'published': published
                                 };
 
                                 body = JSON.stringify(body);
@@ -399,7 +397,14 @@
                         tableContent += "<tr>";
                         tableContent += "<td>" + postList[i].id + "</td>";
                         tableContent += "<td>" + postList[i].title + "</td>";
-                        tableContent += "<td>" + postList[i].content + "</td>";
+
+                        let words = postList[i].content.split(' ');
+                        let limitedContent = words.slice(0, 50).join(' ');
+                        if (words.length > 50) {
+                            limitedContent += '...';
+                        }
+                        tableContent += "<td>" + limitedContent + "</td>";
+
                         tableContent += "<td>" + postList[i].createdAt + "</td>";
                         tableContent += "<td>";
                         if (postList[i].tags && postList[i].tags.length > 0) {

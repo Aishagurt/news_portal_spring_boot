@@ -61,6 +61,7 @@ public class UserService implements UserDetailsService {
     public UserDTO updatePassword(String newPassword, String oldPassword) {
 
         User currentUser = getCurrentSessionUser();
+
         if(passwordEncoder.matches(oldPassword, currentUser.getPassword())){
             currentUser.setPassword(passwordEncoder.encode(newPassword));
             return userMapper.toUserDTO(userRepository.save(currentUser));
@@ -79,15 +80,12 @@ public class UserService implements UserDetailsService {
         return null;
     }
     public UserDTO updateUser(UserDTO user) {
-        User existingUser = userRepository.findById(user.getId()).orElse(null);
-        User updatedUser = userMapper.toUser(user);
-        assert existingUser != null;
-        updatedUser.setEmail(user.getEmail());
-        updatedUser.setFullName(user.getFullName());
+        User currentUser = getCurrentSessionUser();
 
-        User savedPost = userRepository.save(updatedUser);
+        currentUser.setEmail(user.getEmail());
+        currentUser.setFullName(user.getFullName());
 
-        return userMapper.toUserDTO(savedPost);
+        return userMapper.toUserDTO(userRepository.save(currentUser));
     }
 
     private Set<Permission> mapPermissionDTOs(List<Permission> permissions){

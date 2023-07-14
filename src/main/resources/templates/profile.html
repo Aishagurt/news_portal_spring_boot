@@ -9,9 +9,7 @@
                         <button class="btn btn-secondary">
                             <img src="https://i.imgur.com/wvxPV9S.png" height="100" width="100" />
                         </button>
-                        <input type="hidden" id="permissions" data-permissions="${#authentication.principal.permissions.![authority]}" />
                         <input id="id" type="hidden" th:value="${#authentication.principal.id}">
-                        <input id="password" type="hidden" th:value="${#authentication.principal.password}">
                         <input id="name" class="name mt-3 form-control" type="text" th:value="${#authentication.principal.fullName}" readonly>
                         <div class="d-flex flex-row justify-content-center align-items-center mt-3">
                             <input id="email" class="email form-control" type="email" th:value="${#authentication.principal.email}" readonly>
@@ -57,20 +55,16 @@
                 httpRequest.open("PUT", "/user", true);
                 httpRequest.setRequestHeader("Content-Type", "application/json");
 
-                const id = document.getElementById('id').value;
+                const userId = document.getElementById('id').value;
                 const nameInput = document.getElementById('name').value;
                 const emailInput = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const permissions = document.getElementById('permissions').getAttribute('data-permissions').split(',');
-                const permissionObjects = permissions.map(permission => {
-                    return { role: permission };
-                });
+
                 const data = {
-                    id: id,
+                    id: userId,
                     fullName: nameInput,
                     email: emailInput,
-                    password: password,
-                    permissions: permissionObjects
+                    password: "",
+                    permissions: []
                 };
 
                 const body = JSON.stringify(data);

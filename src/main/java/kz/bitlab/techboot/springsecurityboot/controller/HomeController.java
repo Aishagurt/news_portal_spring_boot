@@ -1,6 +1,5 @@
 package kz.bitlab.techboot.springsecurityboot.controller;
 
-
 import kz.bitlab.techboot.springsecurityboot.dto.CategoryDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.UserDTO;
@@ -113,8 +112,8 @@ public class HomeController {
     }
 
     @GetMapping("/load-more")
-    public ResponseEntity<List<PostDTO>> loadMorePosts(@RequestParam("page") int page) {
-        List<PostDTO> morePosts = postService.getMorePosts(page, POSTS_PER_PAGE);
+    public ResponseEntity<List<PostDTO>> loadMorePosts(@RequestParam("page") int page, @RequestParam(value = "catId", required = false) Long catId) {
+        List<PostDTO> morePosts = postService.getMorePosts(page, POSTS_PER_PAGE, catId);
         return ResponseEntity.ok(morePosts);
     }
 
@@ -137,7 +136,7 @@ public class HomeController {
         List<CategoryDTO> categoryDTOS = categoryService.getCategories();
         model.addAttribute("categories", categoryDTOS);
 
-        List<PostDTO> postDTOS = postService.getPostsByCategoryId(id);
+        List<PostDTO> postDTOS = postService.getInitialPostsByCategoryId(id);
         model.addAttribute("posts", postDTOS);
         return "/posts";
     }

@@ -1,5 +1,6 @@
 package kz.bitlab.techboot.springsecurityboot.service;
 
+import kz.bitlab.techboot.springsecurityboot.dto.CategoryDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.mapper.CategoryMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.PostMapper;
@@ -22,6 +23,7 @@ public class PostService {
     private final PostMapper postMapper;
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
     private final int POSTS_PER_PAGE = 7;
 
     public List<PostDTO> getPosts() { return postMapper.toDtoList(postRepository.findAll()); }
@@ -55,6 +57,11 @@ public class PostService {
                 tag.getPosts().remove(post);
             }
 
+            Category category = post.getCategory();
+            if (category != null) {
+                post.setCategory(null);
+                categoryRepository.save(category);
+            }
             post.setTags(null);
             postRepository.save(post);
             postRepository.delete(post);
@@ -87,17 +94,14 @@ public class PostService {
         return tags;
     }
 
-    public List<PostDTO> getPosts(int startIndex, int limit) {
-        List<PostDTO> allPosts = postMapper.toDtoList(postRepository.findAll());
-        int endIndex = Math.min(startIndex + limit, allPosts.size());
-
-        return allPosts.subList(startIndex, endIndex);
-    }
-
-    public List<PostDTO> getPostsByCategoryId(Long id){
+    public List<PostDTO> getInitialPostsByCategoryId(Long id){
         Category category = categoryRepository.findById(id).orElse(null);
-        List<Post> posts = postRepository.findByCategory(category);
-        return postMapper.toDtoList(posts);
+        List<PostDTO> posts = postMapper.toDtoList(postRepository.findByCategory(category));
+        List<PostDTO> initialPosts = new ArrayList<>();
+        for(int i = 0; i < POSTS_PER_PAGE && i < posts.size(); i++){
+            initialPosts.add(posts.get(i));
+        }
+        return initialPosts;
     }
 
     public List<PostDTO> getInitialPosts() {
@@ -109,11 +113,24 @@ public class PostService {
         return initialPosts;
     }
 
-    public List<PostDTO> getMorePosts(int page, int postsPerPage) {
-        List<PostDTO> allPosts = getPosts();
-        int totalPosts = allPosts.size();
+    public List<PostDTO> getMorePosts(int page, int postsPerPage, Long catId) {
+        List<PostDTO> posts;
+
+        if(catId!= null) {
+            Category category = categoryRepository.findById(catId).orElse(null);
+            posts = postMapper.toDtoList(postRepository.findByCategory(category));
+        }else {
+            posts = postMapper.toDtoList(postRepository.findAll());
+        }
+
+        int totalPosts = posts.size();
         int startIndex = page * postsPerPage;
+
+        if (startIndex >= totalPosts) {
+            return Collections.emptyList();
+        }
+
         int endIndex = Math.min(startIndex + postsPerPage, totalPosts);
-        return allPosts.subList(startIndex, endIndex);
+        return posts.subList(startIndex, endIndex);
     }
 }

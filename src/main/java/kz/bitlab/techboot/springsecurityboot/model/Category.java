@@ -16,13 +16,4 @@ public class Category extends BaseModel{
 
     @Column(name = "name", nullable = false)
     private String name;
-    @OneToMany(mappedBy = "category")
-    @JsonIgnore
-    private Set<Post> posts;
-
-    public void removePost(Post post){
-        if(post != null){
-            posts.remove(post);
-        }
-    }
 }
