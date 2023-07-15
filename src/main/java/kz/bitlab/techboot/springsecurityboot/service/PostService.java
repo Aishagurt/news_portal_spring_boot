@@ -1,17 +1,18 @@
 package kz.bitlab.techboot.springsecurityboot.service;
 
-import kz.bitlab.techboot.springsecurityboot.dto.CategoryDTO;
+import kz.bitlab.techboot.springsecurityboot.dto.CommentDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.mapper.CategoryMapper;
+import kz.bitlab.techboot.springsecurityboot.mapper.CommentMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.PostMapper;
 import kz.bitlab.techboot.springsecurityboot.model.Category;
+import kz.bitlab.techboot.springsecurityboot.model.Comment;
 import kz.bitlab.techboot.springsecurityboot.model.Post;
 import kz.bitlab.techboot.springsecurityboot.model.Tag;
 import kz.bitlab.techboot.springsecurityboot.repository.CategoryRepository;
 import kz.bitlab.techboot.springsecurityboot.repository.PostRepository;
 import kz.bitlab.techboot.springsecurityboot.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,6 +25,9 @@ public class PostService {
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final CommentService commentService;
+    private final CommentMapper commentMapper;
+
     private final int POSTS_PER_PAGE = 7;
 
     public List<PostDTO> getPosts() { return postMapper.toDtoList(postRepository.findAll()); }
@@ -40,7 +44,6 @@ public class PostService {
             category.setName(categoryName);
             category = categoryRepository.save(category);
         }
-
         post.setCategory(category);
 
         Post savedPost = postRepository.save(post);
@@ -62,6 +65,9 @@ public class PostService {
                 post.setCategory(null);
                 categoryRepository.save(category);
             }
+
+            commentService.deleteCommentsByPost(post);
+
             post.setTags(null);
             postRepository.save(post);
             postRepository.delete(post);
@@ -77,6 +83,9 @@ public class PostService {
         Category category = categoryRepository.findByName(categoryName);
 
         updatedPost.setCategory(category);
+
+        List<CommentDTO> comments = commentService.getCommentsByPostId(existingPost.getId());
+        updatedPost.setComments(commentMapper.toModelList(comments));
 
         Post savedPost = postRepository.save(updatedPost);
         return postMapper.toPostDTO(savedPost);

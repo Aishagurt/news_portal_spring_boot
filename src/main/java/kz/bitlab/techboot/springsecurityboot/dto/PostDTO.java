@@ -16,7 +16,6 @@ public class PostDTO {
     private LocalDateTime createdAt;
     private String category;
     private List<Tag> tags;
+    private List<CommentDTO> comments;
     private String imageUrl;
-    private boolean published;
-
 }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.Cascade;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,11 +37,12 @@ public class Post extends BaseModel{
     )
     private Set<Tag> tags;
 
+    @Column(name="comments")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
-
-    @Column(name = "is_published", nullable = false)
-    private boolean published;
 
     public void addTag(Tag tag) {
         if (tags == null) {

@@ -104,8 +104,6 @@
 
                 let categorySelectedName = selectedCategory.options[selectedCategory.selectedIndex].text;
 
-                console.log(categorySelectedName);
-
                 let body = {
                     title: title.value,
                     content: content.value,
@@ -113,6 +111,7 @@
                     category: categorySelectedName,
                     tags: tags,
                     imageUrl: imageUrl.value,
+                    comments: null
                 };
 
                 body = JSON.stringify(body);
@@ -362,7 +361,7 @@
                                     httpRequest.open("DELETE", "/api/post/delete-post/"+postId.value, true);
 
                                     httpRequest.onreadystatechange = function () {
-                                        if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                                        if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
                                             detailsModal.hide();
                                             loadPosts();
                                         }
@@ -472,7 +471,6 @@
             }
             httpRequest.send();
         }
-
     </script>
 
 </div>

@@ -67,13 +67,105 @@
                     </div>
                 </div>
             </div>
-
+        </div>
+        <hr>
+        <h6 class="card-subtitle mb-2 text-muted">Comments:</h6>
+        <div class="comments-list mb-4" id="commentsList">
 
         </div>
 
+        <input id="postId" type="hidden" th:value="${post.getId()}">
+        <div class="mt-4 mb-2" id="commentForm" sec:authorize="isAuthenticated()">
+            <input id="commentAuthor" type="hidden" th:value="${#authentication?.principal?.fullName ?: ''}" >
+            <div class="mb-3">
+                <label for="commentContent" class="form-label">Comment</label>
+                <textarea class="form-control" id="commentContent" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" onclick="addComment()">Submit</button>
+        </div>
+
+        <script type="text/javascript">
+            loadComments();
+            function loadComments(){
+                const postId = document.getElementById('postId').value;
+
+                const httpRequest = new XMLHttpRequest();
+                httpRequest.open("POST", "/api/comments/" + postId, true);
+                httpRequest.onreadystatechange = function () {
+                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+
+                        let comments = JSON.parse(httpRequest.responseText);
+
+                        let listContent = "";
+                        for (let i = 0; i < comments.length; i++) {
+                            listContent += "<div class='card mb-2'>" +
+                                "<div class='card-body'>" +
+                                "<div class='d-flex justify-content-between align-items-center'>" +
+                                "<h6 class='card-title'>" + comments[i].fullName + "</h6>";
+                            if ("<%= request.isUserInRole('ROLE_ADMIN') %>") {
+                                listContent += "<button class='btn btn-sm btn-danger delete-comment' onclick='deleteComment(" + comments[i].id + ")'>&times;</button>";
+                            }
+                            listContent += "</div>" +
+                                "<p class='card-text'>" + comments[i].content + "</p>";
+
+                            var date = new Date(comments[i].commentedAt);
+                            var options = { month: 'short', day: 'numeric', locale: 'en-US' };
+                            var formattedDate = date.toLocaleDateString('en-US', options);
+
+                            listContent += "<small class='text-muted'>" + formattedDate + "</small>" +
+                                "</div></div>";
+                        }
+                        document.getElementById("commentsList").innerHTML = listContent;
+                    }
+                };
+
+                httpRequest.send();
+            }
+            function addComment() {
+                const postId = document.getElementById('postId').value;
+
+                const httpRequest = new XMLHttpRequest();
+                httpRequest.open("POST", "/api/comments/add-comment/" + postId, true);
+                httpRequest.setRequestHeader("Content-Type", "application/json");
+
+                let commentAuthor = document.getElementById('commentAuthor').value;
+                let commentContent = document.getElementById('commentContent').value;
+                let now = new Date();
+                let createdAt = now.toISOString();
+
+                httpRequest.onreadystatechange = function() {
+                    if (httpRequest.readyState == XMLHttpRequest.DONE && httpRequest.status == 200) {
+                        document.getElementById('commentContent').value = '';
+                        loadComments();
+                    }
+                };
+
+                let body = {
+                    fullName: commentAuthor,
+                    commentedAt: createdAt,
+                    content: commentContent,
+                };
+
+                body = JSON.stringify(body);
+                httpRequest.send(body);
+            }
+            function deleteComment(commentId){
+                let postId = document.getElementById('postId').value;
+                const httpRequest = new XMLHttpRequest();
+                const url = `/api/comments/${postId}?commentId=${commentId}`;
+
+                httpRequest.open("DELETE", url, true);
+                httpRequest.onreadystatechange = function () {
+                    if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
+                        loadComments();
+                    }
+                };
+
+                httpRequest.send();
+            }
+        </script>
+
     </main>
-
-
 
 </div>
 

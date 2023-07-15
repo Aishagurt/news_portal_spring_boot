@@ -1,6 +1,9 @@
 package kz.bitlab.techboot.springsecurityboot.api;
 
+import jakarta.transaction.Transactional;
+import kz.bitlab.techboot.springsecurityboot.dto.CommentDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
+import kz.bitlab.techboot.springsecurityboot.service.CommentService;
 import kz.bitlab.techboot.springsecurityboot.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,8 @@ import java.util.List;
 public class PostController {
     @Autowired
     private final PostService postService;
+    @Autowired
+    private final CommentService commentService;
 
     @GetMapping
     public List<PostDTO> getPostList(){ return postService.getPosts(); }
@@ -29,7 +34,10 @@ public class PostController {
     public PostDTO updatePost(@RequestBody PostDTO postDTO){ return postService.updatePost(postDTO); }
 
     @DeleteMapping(value = "/delete-post/{id}")
+    @Transactional
     public void deletePost(@PathVariable(name = "id") Long id){ postService.deletePost(id); }
 
+    @PostMapping(value = "/{id}/comments")
+    public List<CommentDTO> getComments(@PathVariable(name = "id") Long id){ return commentService.getCommentsByPostId(id); }
 
 }
