@@ -1,0 +1,21 @@
+version: "3"
+services:
+  server:
+    image: finalimage
+    ports:
+      - "8080:8080"
+    networks:
+      - mysql-network
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql:latest
+    networks:
+      - mysql-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=mydatabase
+
+networks:
+  mysql-network:
