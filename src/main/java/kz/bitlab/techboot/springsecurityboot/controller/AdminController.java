@@ -16,18 +16,18 @@ public class AdminController {
     @GetMapping(value = "/admin-panel")
     public String addPostPage(Model model){
         model.addAttribute("categories", categoryService.getCategories());
-        return "/add-post";
+        return "add-post";
     }
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping(value = "/add-tag")
     public String addTagPage(Model model){
         model.addAttribute("categories", categoryService.getCategories());
-        return "/add-tag";
+        return "add-tag";
     }
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping(value = "/add-category")
     public String addCategoryPage(Model model){
         model.addAttribute("categories", categoryService.getCategories());
-        return "/add-category";
+        return "add-category";
     }
 }

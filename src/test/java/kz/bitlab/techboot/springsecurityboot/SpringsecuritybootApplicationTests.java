@@ -8,7 +8,6 @@ import kz.bitlab.techboot.springsecurityboot.model.Post;
 import kz.bitlab.techboot.springsecurityboot.model.Tag;
 import kz.bitlab.techboot.springsecurityboot.repository.PostRepository;
 import kz.bitlab.techboot.springsecurityboot.service.PostService;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

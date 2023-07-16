@@ -85,7 +85,7 @@ public class HomeController {
     @GetMapping("/log-out")
     public RedirectView logOut() {
         userService.logout();
-        return new RedirectView("/posts");
+        return new RedirectView("posts");
     }
 
     @PostMapping(value = "/to-sign-up")
@@ -108,7 +108,7 @@ public class HomeController {
         List<CategoryDTO> categoryDTOS = categoryService.getCategories();
         model.addAttribute("categories", categoryDTOS);
 
-        return "/posts";
+        return "posts";
     }
 
     @GetMapping("/load-more")
@@ -125,7 +125,7 @@ public class HomeController {
         List<CategoryDTO> categoryDTOS = categoryService.getCategories();
         model.addAttribute("categories", categoryDTOS);
 
-        return "/postInfo";
+        return "postInfo";
     }
 
     @GetMapping(value = "/category/{catId}")
@@ -138,7 +138,7 @@ public class HomeController {
 
         List<PostDTO> postDTOS = postService.getInitialPostsByCategoryId(id);
         model.addAttribute("posts", postDTOS);
-        return "/posts";
+        return "posts";
     }
 
 }
