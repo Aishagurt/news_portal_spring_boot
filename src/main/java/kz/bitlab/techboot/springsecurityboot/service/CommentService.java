@@ -1,7 +1,6 @@
 package kz.bitlab.techboot.springsecurityboot.service;
 
 import kz.bitlab.techboot.springsecurityboot.dto.CommentDTO;
-import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
 import kz.bitlab.techboot.springsecurityboot.mapper.CommentMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.PostMapper;
 import kz.bitlab.techboot.springsecurityboot.model.Comment;
@@ -17,12 +16,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
+
     @Autowired
     private final PostRepository postRepository;
+
     @Autowired
     private final CommentRepository commentRepository;
-    @Autowired
-    private final PostMapper postMapper;
+
     @Autowired
     private final CommentMapper commentMapper;
 
@@ -44,6 +44,7 @@ public class CommentService {
             return commentMapper.toCommentDTO(comment);
         } else return null;
     }
+
     public void deleteComment(Long postId, Long commentId){
         Post post = postRepository.findById(postId).orElse(null);
         if(post != null) {
@@ -52,7 +53,8 @@ public class CommentService {
             post.getComments().remove(comment);
             postRepository.save(post);
 
-            commentRepository.delete(comment);
+            if(comment != null)
+                commentRepository.delete(comment);
         }
     }
 }

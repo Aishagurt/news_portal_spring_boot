@@ -6,7 +6,6 @@ import kz.bitlab.techboot.springsecurityboot.mapper.CategoryMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.CommentMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.PostMapper;
 import kz.bitlab.techboot.springsecurityboot.model.Category;
-import kz.bitlab.techboot.springsecurityboot.model.Comment;
 import kz.bitlab.techboot.springsecurityboot.model.Post;
 import kz.bitlab.techboot.springsecurityboot.model.Tag;
 import kz.bitlab.techboot.springsecurityboot.repository.CategoryRepository;
@@ -20,12 +19,17 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PostService {
+
     private final PostRepository postRepository;
+
     private final PostMapper postMapper;
+
     private final TagRepository tagRepository;
+
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
+
     private final CommentService commentService;
+
     private final CommentMapper commentMapper;
 
     private final int POSTS_PER_PAGE = 7;
@@ -77,7 +81,7 @@ public class PostService {
         Post existingPost = postRepository.findById(postDTO.getId()).orElse(null);
         Post updatedPost = postMapper.toPost(postDTO);
         updatedPost.setTags(mapTagDTOs(postDTO.getTags()));
-        updatedPost.setCreatedAt(existingPost.getCreatedAt());
+        updatedPost.setCreatedAt(postDTO.getCreatedAt());
 
         String categoryName = postDTO.getCategory();
         Category category = categoryRepository.findByName(categoryName);

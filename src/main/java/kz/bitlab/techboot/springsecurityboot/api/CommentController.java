@@ -18,10 +18,12 @@ public class CommentController {
     public List<CommentDTO> getComments(@PathVariable Long postId) {
         return commentService.getCommentsByPostId(postId);
     }
+
     @PostMapping("/add-comment/{id}")
     public CommentDTO addComment(@PathVariable(name = "id") Long id, @RequestBody CommentDTO commentDTO){
         return commentService.addComment(id, commentDTO);
     }
+
     @DeleteMapping("/{id}")
     public void deleteComment(@PathVariable(name = "id") Long id, @RequestParam("commentId") Long commentId) {
         commentService.deleteComment(id, commentId);

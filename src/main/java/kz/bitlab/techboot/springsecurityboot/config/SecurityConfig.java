@@ -1,7 +1,6 @@
 package kz.bitlab.techboot.springsecurityboot.config;
 
 import kz.bitlab.techboot.springsecurityboot.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;

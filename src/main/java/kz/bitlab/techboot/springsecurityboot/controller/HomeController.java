@@ -26,8 +26,10 @@ public class HomeController {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private PostService postService;
+
     @Autowired
     private CategoryService categoryService;
 

@@ -17,7 +17,9 @@ import java.util.List;
 public class TagService {
 
     private final TagRepository tagRepository;
+
     private final TagMapper tagMapper;
+
     private final PostRepository postRepository;
 
     public List<TagDTO> getTags(){

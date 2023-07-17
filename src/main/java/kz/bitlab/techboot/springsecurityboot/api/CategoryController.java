@@ -22,7 +22,6 @@ public class CategoryController {
     @GetMapping(value = "/get-category/{id}")
     public CategoryDTO getCategory(@PathVariable(name = "id") Long id){ return categoryService.getCategory(id); }
 
-
     @PostMapping(value = "/add-category")
     public CategoryDTO addCategory(@RequestBody CategoryDTO categoryDTO){ return categoryService.addCategory(categoryDTO);}
 

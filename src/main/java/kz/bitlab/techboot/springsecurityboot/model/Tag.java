@@ -19,6 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Tag extends BaseModel{
+
     @Column(name = "tag_name", nullable = false)
     private String name;
     @ManyToMany(mappedBy = "tags")

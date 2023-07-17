@@ -17,7 +17,9 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+
     private final CategoryMapper categoryMapper;
+
     private final PostRepository postRepository;
 
     public List<CategoryDTO> getCategories(){
@@ -35,8 +37,6 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElse(null);
         if (category != null) {
-            List<Post> posts = new ArrayList<>();
-
             List<Post> affectedPosts = postRepository.findByCategory(category);
             for (Post post : affectedPosts) {
                 post.removeCategory(category);

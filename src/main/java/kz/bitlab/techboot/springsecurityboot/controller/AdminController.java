@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class AdminController {
+
     @Autowired
     private CategoryService categoryService;
 
@@ -18,12 +19,14 @@ public class AdminController {
         model.addAttribute("categories", categoryService.getCategories());
         return "add-post";
     }
+
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping(value = "/add-tag")
     public String addTagPage(Model model){
         model.addAttribute("categories", categoryService.getCategories());
         return "add-tag";
     }
+
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping(value = "/add-category")
     public String addCategoryPage(Model model){

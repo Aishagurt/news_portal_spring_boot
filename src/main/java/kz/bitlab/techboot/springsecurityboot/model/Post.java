@@ -15,6 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class Post extends BaseModel{
+
     @Column(name = "post_title", nullable = false)
     private String title;
 

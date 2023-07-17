@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
@@ -25,8 +24,10 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private PermissionRepository permissionRepository;
+
     @Autowired
     private UserMapper userMapper;
 
@@ -79,6 +80,7 @@ public class UserService implements UserDetailsService {
         }
         return null;
     }
+
     public UserDTO updateUser(UserDTO user) {
         User currentUser = getCurrentSessionUser();
 

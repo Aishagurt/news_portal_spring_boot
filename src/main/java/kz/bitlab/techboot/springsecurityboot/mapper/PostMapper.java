@@ -15,15 +15,18 @@ import java.util.Set;
 
 @Mapper(componentModel = "spring", uses = TagMapper.class)
 public interface PostMapper {
+
     @Mapping(source = "category.name", target = "category")
     @Mapping(source = "comments", target = "comments", qualifiedByName = "mapCommentsToCommentDTOs")
     PostDTO toPostDTO(Post post);
+
     @InheritInverseConfiguration
     @Mapping(source = "category", target = "category.name")
     @Mapping(source = "comments", target = "comments", qualifiedByName = "mapCommentDTOsToComments")
     Post toPost(PostDTO postDTO);
 
     List<PostDTO> toDtoList(List<Post> courseList);
+
     List<Post> toModelList(List<PostDTO> courseList);
 
     default List<TagDTO> mapTags(Set<Tag> tags) {

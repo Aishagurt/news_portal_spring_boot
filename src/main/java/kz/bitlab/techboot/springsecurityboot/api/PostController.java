@@ -7,7 +7,6 @@ import kz.bitlab.techboot.springsecurityboot.service.CommentService;
 import kz.bitlab.techboot.springsecurityboot.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +15,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value="/api/post")
 public class PostController {
+
     @Autowired
     private final PostService postService;
+
     @Autowired
     private final CommentService commentService;
 
@@ -39,5 +40,4 @@ public class PostController {
 
     @PostMapping(value = "/{id}/comments")
     public List<CommentDTO> getComments(@PathVariable(name = "id") Long id){ return commentService.getCommentsByPostId(id); }
-
 }
