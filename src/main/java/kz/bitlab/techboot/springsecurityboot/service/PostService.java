@@ -2,7 +2,6 @@ package kz.bitlab.techboot.springsecurityboot.service;
 
 import kz.bitlab.techboot.springsecurityboot.dto.CommentDTO;
 import kz.bitlab.techboot.springsecurityboot.dto.PostDTO;
-import kz.bitlab.techboot.springsecurityboot.mapper.CategoryMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.CommentMapper;
 import kz.bitlab.techboot.springsecurityboot.mapper.PostMapper;
 import kz.bitlab.techboot.springsecurityboot.model.Category;
